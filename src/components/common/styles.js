@@ -5,7 +5,7 @@ const Container = styled.div`
   justify-content: space-between;
   align-items: center;
 `;
-const InfoPannel = styled.div`
+const InfoPanel = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -15,7 +15,7 @@ const InfoPannel = styled.div`
   color: #999;
 `;
 
-const PreviewDataPannel = styled.div`
+const PreviewDataPanel = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -29,4 +29,4 @@ const PreviewDataPannel = styled.div`
   }
 `;
 
-export { Container, InfoPannel, PreviewDataPannel };
+export { Container, InfoPanel, PreviewDataPanel };

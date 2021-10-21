@@ -3,8 +3,9 @@ import * as Yup from "yup";
 const FORM_STRUCTURE = [
   {
     inputType: "inputText",
-    name: "motherName",
-    label: "Nome da Mãe"
+    name: "cpf",
+    label: "Informe seu CPF",
+    displayRule: (formState) => true,
   },
   {
     inputType: "dropdown",
@@ -13,51 +14,62 @@ const FORM_STRUCTURE = [
     options: [
       {
         label: "Selecione",
-        value: ""
+        value: "",
       },
       {
         label: "Casado",
-        value: "ca"
+        value: "ca",
       },
       {
         label: "Solteiro",
-        value: "so"
+        value: "so",
       },
       {
         label: "Separado",
-        value: "se"
+        value: "se",
+      },
+    ],
+    displayRule: (formState) => true,
+  },
+  {
+    inputType: "inputText",
+    name: "spouse",
+    label: "Nome do Conjuje",
+    displayRule: ({ maritalStatus }) => {
+      if (maritalStatus === "ca") {
+        return true;
       }
-    ]
+    },
   },
-  {
-    inputType: "inputText",
-    name: "nationality",
-    label: "Nacionalidade"
-  },
-  {
-    inputType: "inputText",
-    name: "nationality2",
-    label: "Qualquer Coisa"
-  }
 ];
 
 const VALIDATION_SCHEMA = Yup.object().shape();
 
-const INITIAL_FORM_DATA = {
-  maritalStatus: "so"
+const INITIAL_FORM_DATA = {};
+
+const prevScreenAction = (formState) => {
+  return {
+    prevScreen: "S4",
+    prevRoute: "/screen4",
+  };
+};
+
+const nextScreenAction = (formState) => {
+  return {
+    nextScreen: "S6",
+    nextRoute: "/screen6",
+  };
 };
 
 const SCREEN = {
   name: "S5",
-  title: "Dados do usuário",
-  subTitle: "Quase lá",
-  prevScreen: "S4",
-  nextScreen: "S6",
-  prevRoute: "/screen4",
-  nextRoute: "/screen6",
+  title: "Dados do Usuário",
+  subTitle: "Screen 5",
+  prevScreenAction,
+  nextScreenAction,
   form: FORM_STRUCTURE,
   initialFormValues: INITIAL_FORM_DATA,
-  validationSchema: VALIDATION_SCHEMA
+  validationSchema: VALIDATION_SCHEMA,
 };
 
 export default SCREEN;

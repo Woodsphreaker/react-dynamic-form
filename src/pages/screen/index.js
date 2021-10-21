@@ -3,8 +3,8 @@ import { useHistory } from "react-router-dom";
 import getScreenConfig from "../../config/screens";
 import { getStorage, setStorage } from "../../services/storage";
 import { Form } from "../../components/Form";
-import FormSelector from "../../components/FormSelector";
-import { Container, InfoPannel } from "../../components/common/styles";
+import { Container, InfoPanel } from "../../components/common/styles";
+import { FormCore } from "../../components/FormCore";
 
 export default function () {
   const [formState, setFormState] = useState({});
@@ -39,13 +39,50 @@ export default function () {
   const finishPage = (event) => {
     event.preventDefault();
     alert("This flow is end");
+    nextPage();
+  };
+
+  const prevButton = () => {
+    const { prevScreenAction = () => {} } = screenConfig;
+    const { prevRoute } = prevScreenAction(formState) || {};
+
+    if (!prevRoute) {
+      return null;
+    }
+    return <button onClick={prevPage}>Prev</button>;
+  };
+
+  const nextButton = () => {
+    const { nextScreenAction = () => {} } = screenConfig;
+    const { nextRoute, endFlow } = nextScreenAction(formState) || {};
+
+    if (endFlow) {
+      return null;
+    }
+
+    if (!nextRoute) {
+      return null;
+    }
+
+    return <button onClick={handleSubmit}>Next</button>;
+  };
+
+  const endButton = () => {
+    const { nextScreenAction = () => {} } = screenConfig;
+    const { endFlow } = nextScreenAction(formState) || {};
+
+    if (endFlow) {
+      return <button onClick={finishPage}>Finish</button>;
+    }
   };
 
   const handleInputChange = (event) => {
     const { name, value, type } = event.target;
+    const { fieldsMasc = {} } = screenConfig;
+    const { [name]: inputMasc = (inputValue) => inputValue } = fieldsMasc;
 
-    console.log(type);
-    setFormState((oldState) => ({ ...oldState, [name]: value }));
+    // console.log(type);
+    setFormState((oldState) => ({ ...oldState, [name]: inputMasc(value) }));
   };
 
   const formValidate = async () => {
@@ -79,6 +116,15 @@ export default function () {
     getFormInfo();
   }, [screenConfig]);
 
+  const renderFormButtons = ({ buttonType } = {}) => {
+    const buttons = {
+      next: nextButton,
+      prev: prevButton,
+      end: endButton,
+    };
+    return buttons[buttonType]();
+  };
+
   const renderForm = () => {
     const { form } = screenConfig;
 
@@ -86,71 +132,31 @@ export default function () {
       return null;
     }
 
-    return form.map(({ inputType, label, name, options, displayRule }) => (
-      <FormSelector
-        key={name}
-        inputType={inputType}
-        name={name}
-        label={label}
-        value={formState[name] || ""}
-        options={options}
-        displayRule={() => displayRule(formState)}
-        handleInputChange={handleInputChange}
-      />
-    ));
-  };
-
-  const prevButton = () => {
-    const { prevScreenAction = () => {} } = screenConfig;
-    const { prevRoute } = prevScreenAction(formState) || {};
-
-    if (!prevRoute) {
-      return null;
-    }
-    return <button onClick={prevPage}>Prev</button>;
-  };
-
-  const nextButton = () => {
-    const { nextScreenAction = () => {} } = screenConfig;
-    const { nextRoute = {} } = nextScreenAction(formState) || {};
-
-    if (!nextRoute) {
-      return null;
-    }
-    return <button onClick={handleSubmit}>Next</button>;
-  };
-
-  const endButton = () => {
-    const { endFlow } = screenConfig;
-
-    if (!endFlow) {
-      return null;
-    }
-    return <button onClick={finishPage}>Finish</button>;
-  };
-
-  const renderFormButtons = ({ buttonType } = {}) => {
-    const buttons = {
-      next: nextButton,
-      prev: prevButton,
-      end: endButton
-    };
-    return buttons[buttonType]();
+    return (
+      <>
+        <FormCore
+          formData={form}
+          formState={formState}
+          handleInputChange={handleInputChange}
+        />
+        <Container>
+          {renderFormButtons({ buttonType: "prev" })}
+          {renderFormButtons({ buttonType: "next" })}
+          {renderFormButtons({ buttonType: "end" })}
+        </Container>
+      </>
+    );
   };
 
   return (
     <Form>
-      <InfoPannel>
+      <InfoPanel>
         <h1>{screenConfig.title}</h1>
         <h4>{screenConfig.subTitle}</h4>
-      </InfoPannel>
+      </InfoPanel>
       {renderForm()}
+
       <div>formValue: {JSON.stringify(formState)}</div>
-      <Container>
-        {renderFormButtons({ buttonType: "prev" })}
-        {renderFormButtons({ buttonType: "next" })}
-        {renderFormButtons({ buttonType: "end" })}
-      </Container>
     </Form>
   );
 }

@@ -4,10 +4,10 @@ const Input = ({
   label = "",
   name = "",
   value = "",
+  placeholder = "",
   handleInputChange,
-  displayRule
+  displayRule,
 }) => {
-  console.log(name);
   if (!displayRule()) {
     return null;
   }
@@ -19,6 +19,7 @@ const Input = ({
         type="text"
         value={value}
         name={name}
+        placeholder={placeholder}
         onChange={handleInputChange}
       />
     </>
